@@ -1,6 +1,6 @@
-# ControlMotor-G3
-
 # ÁREA 2: Control Motor y Acceso (Hemiparesia)
+## Grupo 3
+
 **Requisitos**
 - Registrar cada evento relevante (tiempos de respuesta, errores, trayectorias).
 - Generar un archivo .json en una carpeta llamada /results con la estructura técnica acordada.
