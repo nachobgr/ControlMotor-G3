@@ -18,17 +18,17 @@ def reducir_sensibilidad(porcentaje):
     ctypes.windll.user32.SystemParametersInfoW(GET_MOUSE_SPEED, 0, ctypes.byref(current_speed), 0) # Obtengo la velocidad actual del mouse y almacenarla en current_speed.value
 
     # Modifico la velocidad segun el porcentaje dado
-    #new_speed = max(1, 5) # vuelvo la velovidad a 5 por defecto
     if porcentaje < 0:
         new_speed = max(1, int(current_speed.value * (1 - abs(porcentaje)/100)))
     else:
         new_speed = min(20, int(current_speed.value * (1 + porcentaje/100)))
+    # new_speed = max(1, 6) # vuelvo la velovidad a 6 por defecto
     
     # Aplicao la nueva velocidad (0x01 actualiza el perfil, 0x02 notifica el cambio)
     ctypes.windll.user32.SystemParametersInfoW(SET_MOUSE_SPEED, 0, new_speed, 0x01 | 0x02)
     
     print(f"Velocidad previa: {current_speed.value}")
-    print(f"Nueva velocidad aplicada (50%): {new_speed}")
+    print(f"Nueva velocidad aplicada: {new_speed}")
 
 
 if __name__ == "__main__":
