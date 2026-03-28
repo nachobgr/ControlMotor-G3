@@ -1,6 +1,7 @@
 import sys
 import json
 import time
+import math
 from datetime import datetime
 from PyQt6.QtWidgets import QApplication, QWidget
 from PyQt6.QtCore import Qt, QRect, QPoint
@@ -26,7 +27,7 @@ class ArrastreSostenido(QWidget):
         # Distribucion en 3 filas: 1,2,3 / 4,5 / 6,7,8
         top_y = m
         middle_y = (h - s) // 2
-        bottom_y = h - m - s
+        bottom_y = h - m - s - 35
 
         left_x = m
         center_x = (w - s) // 2
@@ -43,12 +44,20 @@ class ArrastreSostenido(QWidget):
             8: QRect(right_x, bottom_y, s, s),
         }
 
+        self.simbolos = [
+            ("★", "#D62828"), ("⬤", "#003049"), ("▲", "#2A9D8F"),
+            ("■", "#F77F00"), ("♦", "#6A4C93"), ("♥", "#D62828"),
+            ("♣", "#003049"), ("♠", "#386641"),
+        ]
+
         self.current_number = 1
         self._reset_drag_to_center()
+        self.started = False
         self.dragging = False
         self.drag_offset = QPoint()
         self.completed = False
         self.results = []
+        self.failed_attempts = 0
         self.trial_start = None
 
     def _reset_drag_to_center(self):
@@ -58,6 +67,58 @@ class ArrastreSostenido(QWidget):
             (self.WINDOW_H - ds) // 2,
             ds, ds
         )
+
+    def _reset_test(self):
+        self.current_number = 1
+        self.started = False
+        self.completed = False
+        self.results = []
+        self.failed_attempts = 0
+        self.trial_start = None
+        self._reset_drag_to_center()
+        self.update()
+
+    def _draw_direction_arrow(self, painter, start_point, end_point):
+        dx = end_point.x() - start_point.x()
+        dy = end_point.y() - start_point.y()
+        length = math.hypot(dx, dy)
+        if length < 1:
+            return
+
+        ux = dx / length
+        uy = dy / length
+
+        # Keep the arrow clear of the draggable square and target box.
+        start_offset = self.DRAG_SIZE // 2 + 8
+        end_offset = self.CORNER_SIZE // 2 + 8
+        line_start = QPoint(
+            int(start_point.x() + ux * start_offset),
+            int(start_point.y() + uy * start_offset),
+        )
+        line_end = QPoint(
+            int(end_point.x() - ux * end_offset),
+            int(end_point.y() - uy * end_offset),
+        )
+
+        painter.setPen(QPen(QColor(200, 100, 200), 4))
+        painter.drawLine(line_start, line_end)
+
+        angle = math.atan2(line_end.y() - line_start.y(), line_end.x() - line_start.x())
+        head_len = 16
+        spread = math.pi / 7
+
+        left_head = QPoint(
+            int(line_end.x() - head_len * math.cos(angle - spread)),
+            int(line_end.y() - head_len * math.sin(angle - spread)),
+        )
+        right_head = QPoint(
+            int(line_end.x() - head_len * math.cos(angle + spread)),
+            int(line_end.y() - head_len * math.sin(angle + spread)),
+        )
+
+        painter.setPen(QPen(QColor(200, 100, 200), 4))
+        painter.drawLine(line_end, left_head)
+        painter.drawLine(line_end, right_head)
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -71,15 +132,46 @@ class ArrastreSostenido(QWidget):
             if num < self.current_number:
                 bg, border = QColor(80, 190, 100), QColor(30, 130, 60)
             elif num == self.current_number:
-                bg, border = QColor(200, 220, 255), QColor(50, 100, 200)
+                bg, border = QColor(200, 220, 255), QColor(200, 100, 200)
             else:
                 bg, border = QColor(200, 200, 210), QColor(100, 100, 130)
 
             painter.fillRect(rect, bg)
             painter.setPen(QPen(border, 3))
             painter.drawRect(rect)
-            painter.setPen(QColor(30, 30, 30))
-            painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, str(num))
+            simbolo, color_simbolo = self.simbolos[num - 1]
+            painter.setPen(QColor(color_simbolo))
+            painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, simbolo)
+
+        if not self.started:
+            title_rect = QRect((self.WINDOW_W - 820) // 2, (self.WINDOW_H - 230) // 2, 820, 230)
+            painter.fillRect(title_rect, QColor(220, 255, 220))
+            painter.setPen(QPen(QColor(30, 130, 60), 2))
+            painter.drawRect(title_rect)
+
+            painter.setPen(QColor(30, 130, 60))
+            font_big = QFont("Arial", 28, QFont.Weight.Bold)
+            painter.setFont(font_big)
+            painter.drawText(
+                QRect(title_rect.x(), title_rect.y() + 25, title_rect.width(), 70),
+                Qt.AlignmentFlag.AlignCenter,
+                "Prueba de arrastre sostenido"
+            )
+
+            painter.setPen(QColor(30, 90, 50))
+            font_small = QFont("Arial", 14)
+            painter.setFont(font_small)
+            painter.drawText(
+                QRect(title_rect.x() + 20, title_rect.y() + 105, title_rect.width() - 40, 45),
+                Qt.AlignmentFlag.AlignCenter,
+                "Arrastre cada icono hasta su respectiva ubicacion en la pantalla"
+            )
+            painter.drawText(
+                QRect(title_rect.x() + 20, title_rect.y() + 155, title_rect.width() - 40, 35),
+                Qt.AlignmentFlag.AlignCenter,
+                "Oprima barra de espacio o haga click para comenzar"
+            )
+            return
 
         if self.completed:
             font_big = QFont("Arial", 28, QFont.Weight.Bold)
@@ -90,25 +182,49 @@ class ArrastreSostenido(QWidget):
             painter.drawRect(msg_rect)
             painter.setPen(QColor(30, 130, 60))
             painter.drawText(msg_rect, Qt.AlignmentFlag.AlignCenter, "¡Prueba completada!")
+
+            font_small = QFont("Arial", 12)
+            painter.setFont(font_small)
+            painter.setPen(QColor(30, 90, 50))
+            end_msg_rect = QRect((self.WINDOW_W - 900) // 2, msg_rect.bottom() + 15, 900, 40)
+            painter.drawText(
+                end_msg_rect,
+                Qt.AlignmentFlag.AlignCenter,
+                "Oprima Esc para terminar la prueba o la barra de espacio para repetirla"
+            )
         else:
+            target_rect = self.corners[self.current_number]
+            self._draw_direction_arrow(
+                painter,
+                self.drag_rect.center(),
+                target_rect.center(),
+            )
+
             painter.fillRect(self.drag_rect, QColor(255, 190, 40))
             painter.setPen(QPen(QColor(180, 100, 0), 3))
             painter.drawRect(self.drag_rect)
-            painter.setPen(QColor(50, 30, 0))
+            simbolo_actual, color_actual = self.simbolos[self.current_number - 1]
+            painter.setPen(QColor(color_actual))
             font = QFont("Arial", 22, QFont.Weight.Bold)
             painter.setFont(font)
-            painter.drawText(self.drag_rect, Qt.AlignmentFlag.AlignCenter, str(self.current_number))
+            painter.drawText(self.drag_rect, Qt.AlignmentFlag.AlignCenter, simbolo_actual)
 
             font_small = QFont("Arial", 11)
             painter.setFont(font_small)
             painter.setPen(QColor(80, 80, 80))
-            instr = f"Arrastra el cuadrado {self.current_number} hasta la esquina {self.current_number}"
+            instr = f"Arrastra el símbolo hasta su casilla correspondiente"
             painter.drawText(
                 QRect(0, self.WINDOW_H - 35, self.WINDOW_W, 30),
                 Qt.AlignmentFlag.AlignCenter, instr
             )
 
     def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton and not self.started:
+            self.started = True
+            self.trial_start = None
+            self.update()
+            return
+
         if event.button() == Qt.MouseButton.LeftButton and not self.completed:
             if self.drag_rect.contains(event.pos()):
                 self.dragging = True
@@ -117,11 +233,17 @@ class ArrastreSostenido(QWidget):
                     self.trial_start = time.time()
 
     def mouseMoveEvent(self, event):
+        if not self.started:
+            return
+
         if self.dragging:
             self.drag_rect.moveTopLeft(event.pos() - self.drag_offset)
             self.update()
 
     def mouseReleaseEvent(self, event):
+        if not self.started:
+            return
+
         if not self.dragging:
             return
         self.dragging = False
@@ -131,7 +253,7 @@ class ArrastreSostenido(QWidget):
 
         if self.drag_rect.intersects(target):
             self.results.append({
-                "cuadrado": self.current_number,
+                "esquina": self.current_number,
                 "duracion_seg": duration,
                 "exitoso": True,
             })
@@ -143,15 +265,34 @@ class ArrastreSostenido(QWidget):
                 self._reset_drag_to_center()
                 self.trial_start = time.time()
         else:
+            self.failed_attempts += 1
             self._reset_drag_to_center()
 
         self.update()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            self.close()
+            return
+
+        if not self.started and event.key() == Qt.Key.Key_Space:
+            self.started = True
+            self.trial_start = None
+            self.update()
+            return
+
+        if self.completed and event.key() == Qt.Key.Key_Space:
+            self._reset_test()
+            return
+
+        super().keyPressEvent(event)
 
     def _save_results(self):
         import os
         data = {
             "fecha": datetime.now().isoformat(),
             "prueba": "ArrastreSostenido",
+            "intentos_fallidos": self.failed_attempts,
             "resultados": self.results,
         }
         os.makedirs("results", exist_ok=True)
