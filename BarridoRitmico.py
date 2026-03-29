@@ -5,11 +5,16 @@ import time
 import random
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QGridLayout, QLabel, QHBoxLayout
 from PyQt6.QtCore import Qt, QTimer
+from ExportJson import ClinicalDataLogger
 
-class ClinicalDataLogger:
-    """Registra métricas consolidadas de diagnóstico motor y velocidad de tipeo."""
-    def __init__(self, patient_id):
-        self.patient_id = patient_id
+ID_PACIENTE = "BR_PACIENTE_001"
+
+class ScanningCalibrationUI(QWidget):
+    def __init__(self, patient_id="anon_001", parent=None):
+        super().__init__(parent)
+        self.logger = ClinicalDataLogger(patient_id)
+        
+        # Estructura de métricas que se enviará al logger
         self.metrics = {
             "velocidad_optima_ms": 0,
             "tiempos_reaccion_ms": [], 
@@ -22,33 +27,7 @@ class ClinicalDataLogger:
             "modo_libre_cps": 0,
             "modo_libre_wpm": 0
         }
-        self.results_dir = os.path.join(os.getcwd(), 'results')
-        if not os.path.exists(self.results_dir):
-            os.makedirs(self.results_dir)
 
-    def export(self):
-        if self.metrics["tiempos_reaccion_ms"]:
-            promedio = sum(self.metrics["tiempos_reaccion_ms"]) / len(self.metrics["tiempos_reaccion_ms"])
-            self.metrics["tr_promedio_ms"] = round(promedio, 2)
-            
-        filename = f"{self.patient_id}_evaluacion_motora.json"
-        filepath = os.path.join(self.results_dir, filename)
-        
-        data = {
-            "paciente_id": self.patient_id,
-            "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            "metricas_diagnostico": self.metrics
-        }
-        with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, indent=4, ensure_ascii=False)
-        print(f"Métricas exportadas con éxito a: {filepath}")
-
-
-class ScanningCalibrationUI(QWidget):
-    def __init__(self, patient_id="anon_001", parent=None):
-        super().__init__(parent)
-        self.logger = ClinicalDataLogger(patient_id)
-        
         # Parámetros del sistema
         self.scan_speed_ms = 1500
         self.fase_actual = "SIMBOLOS" 
@@ -110,7 +89,7 @@ class ScanningCalibrationUI(QWidget):
         self.header_layout = QVBoxLayout()
         self.header_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        self.info_label = QLabel("Presiona ESPACIO para comenzar calibración diagnóstica")
+        self.info_label = QLabel("Presiona ESPACIO para comenzar calibración")
         self.info_label.setObjectName("info_label")
         self.info_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.header_layout.addWidget(self.info_label)
@@ -161,7 +140,7 @@ class ScanningCalibrationUI(QWidget):
         self.fase_actual = "ESCRITURA_LIBRE"
         self.display_texto.show()
         self.target_card.hide()
-        self.info_label.setText("MODO LIBRE: Escribe lo que desees. (Presiona ESC para salir y guardar)")
+        self.info_label.setText("MODO LIBRE: Escribe y presiona ESC para salir")
         
         teclado = [
             'Q', 'W', 'E', 'R', 'T', 'Y', 'U',
@@ -182,9 +161,7 @@ class ScanningCalibrationUI(QWidget):
                 fila_ui.append(cell)
             self.grid_cells.append(fila_ui)
             
-        # --- INICIAMOS RELOJ DE ESCRITURA LIBRE ---
         self.tiempo_inicio_libre = time.time()
-        
         self.reiniciar_barrido_a_filas()
         self.scan_timer.start(self.scan_speed_ms)
 
@@ -198,10 +175,8 @@ class ScanningCalibrationUI(QWidget):
     def set_new_symbol_target(self):
         self.target_row = random.randint(0, len(self.grid_cells) - 1)
         self.target_col = random.randint(0, len(self.grid_cells[0]) - 1)
-        
         idx_global = self.target_row * 3 + self.target_col
         simbolo, hex_color = self.simbolos_datos[idx_global]
-        
         self.info_label.setText("FASE 1: Encuentra este símbolo")
         self.target_card.setText(f"<span style='color:{hex_color}'>{simbolo}</span>")
         self.target_card.show()
@@ -224,12 +199,10 @@ class ScanningCalibrationUI(QWidget):
         self.fase_actual = "VALIDACION"
         self.letras_escritas = ""
         self.errores_palabra = 0
-        
         for i in range(3):
             for j in range(3):
                 idx = i * 3 + j
                 self.grid_cells[i][j].setText(self.letras_validacion[idx])
-                
         self.set_next_letter_target()
 
     def start_test(self):
@@ -253,19 +226,15 @@ class ScanningCalibrationUI(QWidget):
 
     def scan_tick(self):
         self.clear_all_highlights()
-
         if self.scan_mode == "FILAS":
             if self.current_row == self.target_row and self.fase_actual != "ESCRITURA_LIBRE":
-                self.logger.metrics["errores_omision"] += 1
-
+                self.metrics["errores_omision"] += 1
             self.current_row = (self.current_row + 1) % len(self.grid_cells)
             self.iluminar_fila_entera(self.current_row, True)
             self.time_highlighted = time.time()
-            
         elif self.scan_mode == "COLUMNAS":
             if self.current_col == self.target_col and self.current_row == self.target_row and self.fase_actual != "ESCRITURA_LIBRE":
-                self.logger.metrics["errores_omision"] += 1
-
+                self.metrics["errores_omision"] += 1
             self.current_col = (self.current_col + 1) % len(self.grid_cells[self.current_row])
             self.update_cell_style(self.grid_cells[self.current_row][self.current_col], True)
             self.time_highlighted = time.time()
@@ -290,16 +259,13 @@ class ScanningCalibrationUI(QWidget):
                 if caracter == '_': self.texto_libre += " "
                 elif caracter == '<': self.texto_libre = self.texto_libre[:-1]
                 else: self.texto_libre += caracter
-                
                 self.display_texto.setText(self.texto_libre)
                 self.reiniciar_barrido_a_filas()
                 return
 
             acierto = (self.current_row == self.target_row and self.current_col == self.target_col)
-
             if acierto:
-                self.logger.metrics["tiempos_reaccion_ms"].append(tr_ms)
-                
+                self.metrics["tiempos_reaccion_ms"].append(tr_ms)
                 if self.fase_actual == "SIMBOLOS":
                     self.errores_consecutivos_fase1 = 0
                     self.scan_speed_ms = int(self.scan_speed_ms * 0.90) 
@@ -308,8 +274,7 @@ class ScanningCalibrationUI(QWidget):
                     self.letras_escritas += self.palabra_objetivo[len(self.letras_escritas)]
                     self.reiniciar_barrido_a_filas(self.set_next_letter_target)
             else:
-                self.logger.metrics["errores_impulsividad"] += 1
-                
+                self.metrics["errores_impulsividad"] += 1
                 if self.fase_actual == "SIMBOLOS":
                     self.errores_consecutivos_fase1 += 1
                     if self.errores_consecutivos_fase1 >= 2:
@@ -318,10 +283,9 @@ class ScanningCalibrationUI(QWidget):
                     else: 
                         self.scan_speed_ms = int(self.scan_speed_ms * 1.10)
                         self.reiniciar_barrido_a_filas(self.set_new_symbol_target)
-                        
                 elif self.fase_actual == "VALIDACION":
                     self.errores_palabra += 1
-                    self.logger.metrics["fallos_fase_validacion"] += 1
+                    self.metrics["fallos_fase_validacion"] += 1
                     if self.errores_palabra > 1:
                         self.scan_speed_ms = int(self.scan_speed_ms * 1.20) 
                         self.letras_escritas = "" 
@@ -338,44 +302,45 @@ class ScanningCalibrationUI(QWidget):
 
     def finalizar_calibracion(self):
         self.scan_timer.stop()
-        self.logger.metrics["velocidad_optima_ms"] = self.scan_speed_ms
-        self.logger.export() # Guarda primer estado por seguridad
+        self.metrics["velocidad_optima_ms"] = self.scan_speed_ms
+        # Calculamos TR promedio antes de exportación parcial
+        if self.metrics["tiempos_reaccion_ms"]:
+            self.metrics["tr_promedio_ms"] = round(sum(self.metrics["tiempos_reaccion_ms"]) / len(self.metrics["tiempos_reaccion_ms"]), 2)
+        
         self.construir_teclado_libre()
 
-    # --- CÁLCULO DE VELOCIDAD FINAL ---
     def guardar_metricas_finales(self):
-        """Calcula CPS y WPM antes de cerrar el programa"""
+        """Calcula métricas de escritura y realiza la exportación final."""
         self.scan_timer.stop()
         if self.fase_actual == "ESCRITURA_LIBRE" and self.tiempo_inicio_libre > 0:
             tiempo_total_s = time.time() - self.tiempo_inicio_libre
             caracteres_finales = len(self.texto_libre)
-            
             cps = caracteres_finales / tiempo_total_s if tiempo_total_s > 0 else 0
             wpm = (cps * 60) / 5
             
-            self.logger.metrics["modo_libre_texto_final"] = self.texto_libre
-            self.logger.metrics["modo_libre_tiempo_s"] = round(tiempo_total_s, 2)
-            self.logger.metrics["modo_libre_cps"] = round(cps, 3)
-            self.logger.metrics["modo_libre_wpm"] = round(wpm, 2)
+            self.metrics["modo_libre_texto_final"] = self.texto_libre
+            self.metrics["modo_libre_tiempo_s"] = round(tiempo_total_s, 2)
+            self.metrics["modo_libre_cps"] = round(cps, 3)
+            self.metrics["modo_libre_wpm"] = round(wpm, 2)
+        
+        if self.metrics["tiempos_reaccion_ms"]:
+            self.metrics["tr_promedio_ms"] = round(sum(self.metrics["tiempos_reaccion_ms"]) / len(self.metrics["tiempos_reaccion_ms"]), 2)
             
-        self.logger.export()
+        # Llamada final a la clase para exportar json con el diccionario completo
+        self.logger.exportar_datos(self.metrics)
 
-    # --- CONTROLADORES DE CIERRE DE APLICACIÓN ---
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             self.handle_switch_press()
         elif event.key() == Qt.Key.Key_Escape:
-            self.close() # Llama automáticamente a closeEvent
-        else:
-            super().keyPressEvent(event)
+            self.close() 
 
     def closeEvent(self, event):
-        """Intercepta el cierre de ventana (por ESC o por la X) para garantizar que se guarde el JSON"""
         self.guardar_metricas_finales()
         event.accept()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    modulo = ScanningCalibrationUI(patient_id="paciente_000")
+    modulo = ScanningCalibrationUI(patient_id=ID_PACIENTE)
     modulo.show()
     sys.exit(app.exec())
