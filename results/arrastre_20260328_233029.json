@@ -1,0 +1,47 @@
+{
+  "fecha": "2026-03-28T23:30:29.827142",
+  "prueba": "ArrastreSostenido",
+  "intentos_fallidos": 0,
+  "resultados": [
+    {
+      "esquina": 1,
+      "duracion_seg": 1.473,
+      "exitoso": true
+    },
+    {
+      "esquina": 2,
+      "duracion_seg": 2.441,
+      "exitoso": true
+    },
+    {
+      "esquina": 3,
+      "duracion_seg": 1.778,
+      "exitoso": true
+    },
+    {
+      "esquina": 4,
+      "duracion_seg": 2.276,
+      "exitoso": true
+    },
+    {
+      "esquina": 5,
+      "duracion_seg": 1.794,
+      "exitoso": true
+    },
+    {
+      "esquina": 6,
+      "duracion_seg": 2.372,
+      "exitoso": true
+    },
+    {
+      "esquina": 7,
+      "duracion_seg": 1.538,
+      "exitoso": true
+    },
+    {
+      "esquina": 8,
+      "duracion_seg": 2.388,
+      "exitoso": true
+    }
+  ]
+}

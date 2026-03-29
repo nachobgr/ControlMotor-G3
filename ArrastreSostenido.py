@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import json
 import time
 import math
@@ -9,9 +9,19 @@ from PyQt6.QtGui import QPainter, QColor, QFont, QPen
 
 class ArrastreSostenido(QWidget):
 
-    CORNER_SIZE = 100
-    DRAG_SIZE = 80
+    CORNER_SIZES = {
+        1: 60,
+        2: 140,
+        3: 95,
+        4: 180,
+        5: 70,
+        6: 100,
+        7: 50,
+        8: 165,
+    }
+    DRAG_SIZE = 50
     CORNER_MARGIN = 20
+    CORNER_SQUARES = {1, 3, 6, 8}
 
     def __init__(self):
         super().__init__()
@@ -21,27 +31,36 @@ class ArrastreSostenido(QWidget):
         self.WINDOW_H = screen.height()
 
         m = self.CORNER_MARGIN
-        s = self.CORNER_SIZE
         w, h = self.WINDOW_W, self.WINDOW_H
+        sizes = self.CORNER_SIZES
 
         # Distribucion en 3 filas: 1,2,3 / 4,5 / 6,7,8
-        top_y = m
-        middle_y = (h - s) // 2
-        bottom_y = h - m - s - 35
+        top_row_h = max(sizes[1], sizes[2], sizes[3])
+        middle_row_h = max(sizes[4], sizes[5])
+        bottom_row_h = max(sizes[6], sizes[7], sizes[8])
 
-        left_x = m
-        center_x = (w - s) // 2
-        right_x = w - m - s
+        top_y = m
+        middle_y = (h - middle_row_h) // 2
+        bottom_y = h - m - bottom_row_h - 35
+
+        def left_rect(size, row_y, row_h):
+            return QRect(m, row_y + (row_h - size) // 2, size, size)
+
+        def center_rect(size, row_y, row_h):
+            return QRect((w - size) // 2, row_y + (row_h - size) // 2, size, size)
+
+        def right_rect(size, row_y, row_h):
+            return QRect(w - m - size, row_y + (row_h - size) // 2, size, size)
 
         self.corners = {
-            1: QRect(left_x, top_y, s, s),
-            2: QRect(center_x, top_y, s, s),
-            3: QRect(right_x, top_y, s, s),
-            4: QRect(left_x, middle_y, s, s),
-            5: QRect(right_x, middle_y, s, s),
-            6: QRect(left_x, bottom_y, s, s),
-            7: QRect(center_x, bottom_y, s, s),
-            8: QRect(right_x, bottom_y, s, s),
+            1: left_rect(sizes[1], top_y, top_row_h),
+            2: center_rect(sizes[2], top_y, top_row_h),
+            3: right_rect(sizes[3], top_y, top_row_h),
+            4: left_rect(sizes[4], middle_y, middle_row_h),
+            5: right_rect(sizes[5], middle_y, middle_row_h),
+            6: left_rect(sizes[6], bottom_y, bottom_row_h),
+            7: center_rect(sizes[7], bottom_y, bottom_row_h),
+            8: right_rect(sizes[8], bottom_y, bottom_row_h),
         }
 
         self.simbolos = [
@@ -52,6 +71,14 @@ class ArrastreSostenido(QWidget):
 
         self.current_number = 1
         self._reset_drag_to_center()
+        drag_center = self.drag_rect.center()
+        self.initial_distances = {
+            num: round(math.hypot(
+                drag_center.x() - rect.center().x(),
+                drag_center.y() - rect.center().y()
+            ), 2)
+            for num, rect in self.corners.items()
+        }
         self.started = False
         self.dragging = False
         self.drag_offset = QPoint()
@@ -78,7 +105,7 @@ class ArrastreSostenido(QWidget):
         self._reset_drag_to_center()
         self.update()
 
-    def _draw_direction_arrow(self, painter, start_point, end_point):
+    def _draw_direction_arrow(self, painter, start_point, end_point, target_rect):
         dx = end_point.x() - start_point.x()
         dy = end_point.y() - start_point.y()
         length = math.hypot(dx, dy)
@@ -88,9 +115,8 @@ class ArrastreSostenido(QWidget):
         ux = dx / length
         uy = dy / length
 
-        # Keep the arrow clear of the draggable square and target box.
         start_offset = self.DRAG_SIZE // 2 + 8
-        end_offset = self.CORNER_SIZE // 2 + 8
+        end_offset = min(target_rect.width(), target_rect.height()) // 2 + 8
         line_start = QPoint(
             int(start_point.x() + ux * start_offset),
             int(start_point.y() + uy * start_offset),
@@ -198,6 +224,7 @@ class ArrastreSostenido(QWidget):
                 painter,
                 self.drag_rect.center(),
                 target_rect.center(),
+                target_rect,
             )
 
             painter.fillRect(self.drag_rect, QColor(255, 190, 40))
@@ -212,10 +239,10 @@ class ArrastreSostenido(QWidget):
             font_small = QFont("Arial", 11)
             painter.setFont(font_small)
             painter.setPen(QColor(80, 80, 80))
-            instr = f"Arrastra el símbolo hasta su casilla correspondiente"
             painter.drawText(
                 QRect(0, self.WINDOW_H - 35, self.WINDOW_W, 30),
-                Qt.AlignmentFlag.AlignCenter, instr
+                Qt.AlignmentFlag.AlignCenter,
+                "Arrastra el símbolo hasta su casilla correspondiente"
             )
 
     def mousePressEvent(self, event):
@@ -249,12 +276,19 @@ class ArrastreSostenido(QWidget):
         self.dragging = False
 
         target = self.corners[self.current_number]
-        duration = round(time.time() - (self.trial_start or time.time()), 3)
+        size = self.CORNER_SIZES[self.current_number]
+        ancho = round(size * math.sqrt(2), 2) if self.current_number in self.CORNER_SQUARES else size
 
         if self.drag_rect.intersects(target):
+            duration_ms = round((time.time() - (self.trial_start or time.time())) * 1000)
+            distancia = self.initial_distances[self.current_number]
+            duracion_control_ms = round(135 + 249 * math.log2(distancia / ancho + 1), 2)
             self.results.append({
-                "esquina": self.current_number,
-                "duracion_seg": duration,
+                "destino": self.current_number,
+                "duracion_ms": duration_ms,
+                "duracion_control_ms": duracion_control_ms,
+                "ancho_destino_px": ancho,
+                "distancia_inicial_px": distancia,
                 "exitoso": True,
             })
             self.current_number += 1
@@ -266,6 +300,7 @@ class ArrastreSostenido(QWidget):
                 self.trial_start = time.time()
         else:
             self.failed_attempts += 1
+            self.trial_start = None
             self._reset_drag_to_center()
 
         self.update()
@@ -292,6 +327,7 @@ class ArrastreSostenido(QWidget):
         data = {
             "fecha": datetime.now().isoformat(),
             "prueba": "ArrastreSostenido",
+            "total_intentos": len(self.results) + self.failed_attempts,
             "intentos_fallidos": self.failed_attempts,
             "resultados": self.results,
         }
