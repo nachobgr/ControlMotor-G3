@@ -257,7 +257,7 @@ class ArrastreSostenido(QWidget):
                 self.dragging = True
                 self.drag_offset = event.pos() - self.drag_rect.topLeft()
                 if self.trial_start is None:
-                    self.trial_start = time.time()
+                    self.trial_start = time.perf_counter()
 
     def mouseMoveEvent(self, event):
         if not self.started:
@@ -280,7 +280,11 @@ class ArrastreSostenido(QWidget):
         ancho = round(size * math.sqrt(2), 2) if self.current_number in self.CORNER_SQUARES else size
 
         if self.drag_rect.intersects(target):
-            duration_ms = round((time.time() - (self.trial_start or time.time())) * 1000)
+            if self.trial_start is None:
+                self.trial_start = time.perf_counter()
+            duration_ms = round(
+                (time.perf_counter() - self.trial_start) * 1000
+            )
             distancia = self.initial_distances[self.current_number]
             duracion_control_ms = round(135 + 249 * math.log2(distancia / ancho + 1), 2)
             self.results.append({
@@ -297,7 +301,7 @@ class ArrastreSostenido(QWidget):
                 self._save_results()
             else:
                 self._reset_drag_to_center()
-                self.trial_start = time.time()
+                self.trial_start = None
         else:
             self.failed_attempts += 1
             self.trial_start = None
