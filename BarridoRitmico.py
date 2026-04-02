@@ -1,13 +1,9 @@
 import sys
-import json
-import os
 import time
 import random
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QGridLayout, QLabel, QHBoxLayout
 from PyQt6.QtCore import Qt, QTimer
 from ExportJson import ClinicalDataLogger
-
-ID_PACIENTE = "BR_PACIENTE_001"
 
 class ScanningCalibrationUI(QWidget):
     def __init__(self, patient_id="anon_001", parent=None):
@@ -339,7 +335,7 @@ class ScanningCalibrationUI(QWidget):
         self.guardar_metricas_finales()
         event.accept()
 
-if __name__ == '__main__':
+def ejecutar_prueba_barrido(ID_PACIENTE):
     app = QApplication(sys.argv)
     modulo = ScanningCalibrationUI(patient_id=ID_PACIENTE)
     modulo.show()

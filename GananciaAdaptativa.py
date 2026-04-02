@@ -5,6 +5,7 @@
     donde el usuario debe hacer clic en 5 puntos específicos de la pantalla (esquinas y centro) 
     siguiendo un círculo rojo.
 """
+
 ID_PACIENTE = "GA_PACIENTE_001"  # ID para el archivo JSON
 
 import ctypes
@@ -29,6 +30,10 @@ class CalibradorCorregido:
         self.avg_v = 0  # Velocidad promedio (px/s)
         self.avg_err = 0
         self.total_ov = 0
+
+        # IDs para cancelar procesos after
+        self.after_id_mouse = None
+        self.after_id_parpadeo = None
         
         messagebox.showinfo("CALIBRACION", "Siga los circulos rojos.\nSe calculará su velocidad promedio de desplazamiento.")
         
@@ -52,7 +57,7 @@ class CalibradorCorregido:
         self.trayectoria_actual = []
         self.overshoot_actual = False
         self.inicio_tramo = None
-        self.pos_inicial_mouse = None # Para calcular distancia recorrida
+        self.pos_inicial_mouse = None 
 
         self.canvas = tk.Canvas(self.root, width=self.diametro, height=self.diametro, bg=self.color_transparente, highlightthickness=0)
         self.canvas.pack()
@@ -71,13 +76,16 @@ class CalibradorCorregido:
         self.overshoot_actual = False
         self.trayectoria_actual = []
         self.inicio_tramo = time.time()
-        # Registramos dónde está el mouse al aparecer el nuevo círculo
         self.pos_inicial_mouse = pyautogui.position()
 
     def parpadear(self):
-        estado = 'hidden' if self.canvas.itemcget(self.circulo, 'state') == 'normal' else 'normal'
-        self.canvas.itemconfigure(self.circulo, state=estado)
-        self.root.after(350, self.parpadear)
+        try:
+            if self.root.winfo_exists():
+                estado = 'hidden' if self.canvas.itemcget(self.circulo, 'state') == 'normal' else 'normal'
+                self.canvas.itemconfigure(self.circulo, state=estado)
+                self.after_id_parpadeo = self.root.after(350, self.parpadear)
+        except:
+            pass
 
     def calcular_error_lineal(self, p_actual, p_ini, p_fin):
         x0, y0 = p_actual
@@ -88,34 +96,39 @@ class CalibradorCorregido:
         return num / den if den != 0 else 0
 
     def verificar_mouse(self):
-        mx, my = pyautogui.position()
-        wx, wy = self.root.winfo_x(), self.root.winfo_y()
-        centro_x, centro_y = wx + self.diametro // 2, wy + self.diametro // 2
-        distancia = math.sqrt((mx - centro_x)**2 + (my - centro_y)**2)
+        try:
+            if self.root.winfo_exists():
+                mx, my = pyautogui.position()
+                wx, wy = self.root.winfo_x(), self.root.winfo_y()
+                centro_x, centro_y = wx + self.diametro // 2, wy + self.diametro // 2
+                distancia = math.sqrt((mx - centro_x)**2 + (my - centro_y)**2)
 
-        if distancia <= self.radio_activacion:
-            izq, der, sup, inf = wx, wx + self.diametro, wy, wy + self.diametro
-            if self.indice == 0 and (my < sup or mx > der): self.overshoot_actual = True
-            elif self.indice == 1 and (my < sup or mx < izq): self.overshoot_actual = True
-            elif self.indice == 2 and (my > inf or mx > der): self.overshoot_actual = True
-            elif self.indice == 3 and (my > inf or mx < izq): self.overshoot_actual = True
-            elif self.indice == 4 and (my < sup or mx > der): self.overshoot_actual = True
+                if distancia <= self.radio_activacion:
+                    izq, der, sup, inf = wx, wx + self.diametro, wy, wy + self.diametro
+                    if self.indice == 0 and (my < sup or mx > der): self.overshoot_actual = True
+                    elif self.indice == 1 and (my < sup or mx < izq): self.overshoot_actual = True
+                    elif self.indice == 2 and (my > inf or mx > der): self.overshoot_actual = True
+                    elif self.indice == 3 and (my > inf or mx < izq): self.overshoot_actual = True
+                    elif self.indice == 4 and (my < sup or mx > der): self.overshoot_actual = True
 
-        self.trayectoria_actual.append((mx, my))
-        self.root.after(10, self.verificar_mouse)
+                self.trayectoria_actual.append((mx, my))
+                self.after_id_mouse = self.root.after(10, self.verificar_mouse)
+        except:
+            pass
+
+    #Cancela las tareas programadas para evitar errores al cerrar
+    def detener_procesos(self):        
+        if self.after_id_mouse:
+            self.root.after_cancel(self.after_id_mouse)
+        if self.after_id_parpadeo:
+            self.root.after_cancel(self.after_id_parpadeo)
 
     def registrar_clic(self, event):
         ahora = time.time()
         mx, my = pyautogui.position()
-        
-        # 1. Distancia recorrida en este tramo (del punto anterior al clic actual)
         ix, iy = self.pos_inicial_mouse
         distancia_tramo = math.sqrt((mx - ix)**2 + (my - iy)**2)
-        
-        # 2. Tiempo transcurrido
         tiempo_tramo = ahora - self.inicio_tramo
-        
-        # 3. Velocidad del tramo (evitando división por cero)
         velocidad_tramo = distancia_tramo / tiempo_tramo if tiempo_tramo > 0 else 0
         
         p_ini = self.puntos[self.indice-1] if self.indice > 0 else (self.sw//2, self.sh//2)
@@ -133,19 +146,17 @@ class CalibradorCorregido:
             self.posicionar()
         else:
             self.procesar_logica_final()
+            self.detener_procesos()
             self.root.quit()
             self.root.destroy()
 
     def procesar_logica_final(self):
-        # Promedio de las velocidades de cada tramo
         self.avg_v = sum(d['velocidad'] for d in self.datos_tramos) / len(self.datos_tramos)
         self.avg_err = sum(d['error_camino'] for d in self.datos_tramos) / len(self.datos_tramos)
         self.total_ov = sum(1 for d in self.datos_tramos if d['overshoot'])
         
-        # Lógica de ajuste basada en velocidad (ejemplo: referencia de 800 px/s)
         ref_v = 800 
         if self.avg_err < 80 and self.total_ov < 2:
-            # Si la velocidad es menor a la referencia, se sugiere aumentar sensibilidad
             self.porcentaje_final = ((ref_v / self.avg_v) - 1) * 100 if self.avg_v < ref_v else 0.0
         else:
             penalizacion = (self.total_ov * 10) + ((self.avg_err - 80) / 10)
@@ -169,15 +180,16 @@ def aplicar_ajuste_sensibilidad(porcentaje):
     ctypes.windll.user32.SystemParametersInfoW(SET_MOUSE_SPEED, 0, new_speed, 0x01 | 0x02)
     return vel_previa, new_speed
 
-if __name__ == "__main__":
+def ejecutar_prueba_ganancia(ID_PACIENTE):
+    # 1. Iniciar calibración
     app_root = tk.Tk(); app_root.withdraw()
     calibrador = CalibradorCorregido(app_root)
     app_root.deiconify(); app_root.mainloop()
 
-    # Obtenemos las sensibilidades al aplicar el ajuste
+    # 2. Obtenemos las sensibilidades al aplicar el ajuste
     s_previa, s_actual = aplicar_ajuste_sensibilidad(calibrador.porcentaje_final)
 
-    # Diccionario para exportar json
+    # 3. Diccionario para exportar json
     resultados_finales = {
         "velocidad_promedio_px_s": round(calibrador.avg_v, 2),
         "error_camino_px": round(calibrador.avg_err, 1),
@@ -187,6 +199,23 @@ if __name__ == "__main__":
         "sensibilidad_actual": s_actual
     }
 
-    # Llamar a la clase para exportar json
+    # 4. Llamar a la clase para exportar json
     logger = export.ClinicalDataLogger(ID_PACIENTE)
     logger.exportar_datos(resultados_finales)
+
+    # 5. Cartel de confirmación final
+    mensaje_confirmacion = (
+        f"Sensibilidad previa: {s_previa}\n"
+        f"Sensibilidad actual: {s_actual}\n\n"
+        "¿Desea mantener los cambios?"
+    )
+    
+    confirm_root = tk.Tk(); confirm_root.withdraw()
+    confirm_root.attributes("-topmost", True)
+    
+    mantiene_cambios = messagebox.askyesno("CONFIRMACIÓN DE AJUSTE", mensaje_confirmacion)
+    
+    if not mantiene_cambios:
+        ctypes.windll.user32.SystemParametersInfoW(SET_MOUSE_SPEED, 0, s_previa, 0x01 | 0x02)
+        
+    confirm_root.destroy()
