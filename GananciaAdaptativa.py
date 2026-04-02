@@ -66,9 +66,17 @@ class CalibradorCorregido:
 
         self.canvas.bind("<Button-1>", self.registrar_clic)
 
+        self.root.bind("<Escape>", self.salir_con_esc)
         self.posicionar()
         self.parpadear()
         self.verificar_mouse()
+
+    def salir_con_esc(self, event=None):
+        """Cancela la prueba y regresa al menú principal sin guardar datos."""
+        if messagebox.askyesno("Cancelar", "¿Desea cancelar la calibración y volver al menú?"):
+            self.detener_procesos() # Frenamos los after() de parpadeo y mouse
+            self.root.quit()
+            self.root.destroy()
 
     def posicionar(self):
         cx, cy = self.puntos[self.indice]
