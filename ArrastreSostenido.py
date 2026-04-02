@@ -354,7 +354,7 @@ class ArrastreSostenido(QWidget):
             json.dump(data, f, indent=2, ensure_ascii=False)"""
 
 
-if __name__ == "__main__":
+def ejecutar_prueba_arrastre(ID_PACIENTE):
     app = QApplication(sys.argv)
     window = ArrastreSostenido()
     window.showMaximized()
