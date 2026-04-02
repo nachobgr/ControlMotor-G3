@@ -8,7 +8,7 @@ from ExportJson import ClinicalDataLogger
 class ScanningCalibrationUI(QWidget):
     def __init__(self, patient_id="anon_001", parent=None, tk_root=None):
         super().__init__(parent)
-        self.logger = ClinicalDataLogger(patient_id)
+        self.logger = ClinicalDataLogger(patient_id, subfolder="BarridoRitmico")
         self.tk_root = tk_root  # Referencia a la ventana principal de Tkinter
         
         # Estructura de métricas que se enviará al logger

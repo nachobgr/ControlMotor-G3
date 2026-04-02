@@ -333,15 +333,13 @@ class ArrastreSostenido(QWidget):
 
     def _save_results(self):
         resultados_finales = {
-            "fecha": datetime.now().isoformat(),
-            "prueba": "ArrastreSostenido",
             "total_intentos": len(self.results) + self.failed_attempts,
             "intentos_fallidos": self.failed_attempts,
             "resultados": self.results,
         }
 
         # Llamar a la clase para exportar json
-        logger = export.ClinicalDataLogger(self.ID_PACIENTE)
+        logger = export.ClinicalDataLogger(self.ID_PACIENTE, subfolder="ArrastreSostenido")
         logger.exportar_datos(resultados_finales)
 
 

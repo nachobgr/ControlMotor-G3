@@ -22,13 +22,18 @@ logger = export.ClinicalDataLogger(ID_PACIENTE)
 logger.exportar_datos(resultados_finales)
 
 """
+
 class ClinicalDataLogger:
     """Gestor flexible para exportar métricas personalizadas a formato JSON."""
-    def __init__(self, patient_id):
+    def __init__(self, patient_id, subfolder=None):
         self.patient_id = patient_id
-        # Definimos la ruta de la carpeta 'results' en el directorio actual
-        self.results_dir = os.path.join(os.getcwd(), 'results')
-        
+        # Definimos la ruta de la carpeta 'results' y la subcarpeta
+        base_dir = os.path.join(os.getcwd(), 'results')
+        if subfolder:
+            self.results_dir = os.path.join(base_dir, subfolder)
+        else:
+            self.results_dir = base_dir
+
         # Si la carpeta no existe, la crea automáticamente
         if not os.path.exists(self.results_dir):
             os.makedirs(self.results_dir)

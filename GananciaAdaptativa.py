@@ -208,7 +208,7 @@ def ejecutar_prueba_ganancia(ID_PACIENTE):
     }
 
     # 4. Llamar a la clase para exportar json
-    logger = export.ClinicalDataLogger(ID_PACIENTE)
+    logger = export.ClinicalDataLogger(ID_PACIENTE, subfolder="GananciaAdaptativa")
     logger.exportar_datos(resultados_finales)
 
     # 5. Cartel de confirmación final
