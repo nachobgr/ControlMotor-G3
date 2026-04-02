@@ -24,9 +24,10 @@ class ArrastreSostenido(QWidget):
     CORNER_MARGIN = 20
     CORNER_SQUARES = {1, 3, 6, 8}
 
-    def __init__(self, ID_PACIENTE):
+    def __init__(self, ID_PACIENTE, tk_root=None):
         super().__init__()
         self.ID_PACIENTE = ID_PACIENTE
+        self.tk_root = tk_root  # Referencia a la ventana principal de Tkinter
         self.setWindowTitle("Prueba de Arrastre Sostenido")
         screen = QApplication.primaryScreen().availableGeometry()
         self.WINDOW_W = screen.width()
@@ -314,6 +315,8 @@ class ArrastreSostenido(QWidget):
     def keyPressEvent(self, event):
         if event.key() == Qt.Key.Key_Escape:
             self.close()
+            if self.tk_root:
+                self.tk_root.deiconify()  # Muestra el menú principal de Tkinter
             return
 
         if not self.started and event.key() == Qt.Key.Key_Space:
@@ -342,8 +345,8 @@ class ArrastreSostenido(QWidget):
         logger.exportar_datos(resultados_finales)
 
 
-def ejecutar_prueba_arrastre(ID_PACIENTE):
+def ejecutar_prueba_arrastre(ID_PACIENTE, tk_root=None):
     app = QApplication(sys.argv)
-    window = ArrastreSostenido(ID_PACIENTE)
+    window = ArrastreSostenido(ID_PACIENTE, tk_root)
     window.showMaximized()
-    sys.exit(app.exec())
+    app.exec()

@@ -6,9 +6,10 @@ from PyQt6.QtCore import Qt, QTimer
 from ExportJson import ClinicalDataLogger
 
 class ScanningCalibrationUI(QWidget):
-    def __init__(self, patient_id="anon_001", parent=None):
+    def __init__(self, patient_id="anon_001", parent=None, tk_root=None):
         super().__init__(parent)
         self.logger = ClinicalDataLogger(patient_id)
+        self.tk_root = tk_root  # Referencia a la ventana principal de Tkinter
         
         # Estructura de métricas que se enviará al logger
         self.metrics = {
@@ -329,14 +330,16 @@ class ScanningCalibrationUI(QWidget):
         if event.key() in (Qt.Key.Key_Space, Qt.Key.Key_Return):
             self.handle_switch_press()
         elif event.key() == Qt.Key.Key_Escape:
-            self.close() 
+            self.close()
+            if hasattr(self, 'tk_root') and self.tk_root:
+                self.tk_root.deiconify()  # Muestra el menú principal de Tkinter
 
     def closeEvent(self, event):
         self.guardar_metricas_finales()
         event.accept()
 
-def ejecutar_prueba_barrido(ID_PACIENTE):
+def ejecutar_prueba_barrido(ID_PACIENTE, tk_root=None):
     app = QApplication(sys.argv)
-    modulo = ScanningCalibrationUI(patient_id=ID_PACIENTE)
+    modulo = ScanningCalibrationUI(patient_id=ID_PACIENTE, tk_root=tk_root)
     modulo.show()
-    sys.exit(app.exec())
+    app.exec()

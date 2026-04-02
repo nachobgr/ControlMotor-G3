@@ -1,0 +1,12 @@
+{
+    "paciente_id": "olo",
+    "fecha_registro": "2026-04-02 16:28:46",
+    "datos_sesion": {
+        "velocidad_promedio_px_s": 1263.93,
+        "error_camino_px": 102.8,
+        "overshoots_totales": 1,
+        "ajuste_sugerido_porcentual": -12.3,
+        "sensibilidad_previa": 8,
+        "sensibilidad_actual": 7
+    }
+}

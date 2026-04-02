@@ -1,0 +1,76 @@
+{
+    "paciente_id": "lopez",
+    "fecha_registro": "2026-04-02 16:42:50",
+    "datos_sesion": {
+        "fecha": "2026-04-02T16:42:50.351534",
+        "prueba": "ArrastreSostenido",
+        "total_intentos": 8,
+        "intentos_fallidos": 0,
+        "resultados": [
+            {
+                "destino": 1,
+                "duracion_ms": 962,
+                "duracion_control_ms": 1052.57,
+                "ancho_destino_px": 84.85,
+                "distancia_inicial_px": 1006.48,
+                "exitoso": true
+            },
+            {
+                "destino": 2,
+                "duracion_ms": 562,
+                "duracion_control_ms": 639.36,
+                "ancho_destino_px": 140,
+                "distancia_inicial_px": 430.0,
+                "exitoso": true
+            },
+            {
+                "destino": 3,
+                "duracion_ms": 882,
+                "duracion_control_ms": 898.55,
+                "ancho_destino_px": 134.35,
+                "distancia_inicial_px": 991.14,
+                "exitoso": true
+            },
+            {
+                "destino": 4,
+                "duracion_ms": 592,
+                "duracion_control_ms": 761.63,
+                "ancho_destino_px": 180,
+                "distancia_inicial_px": 850.0,
+                "exitoso": true
+            },
+            {
+                "destino": 5,
+                "duracion_ms": 656,
+                "duracion_control_ms": 1081.19,
+                "ancho_destino_px": 70,
+                "distancia_inicial_px": 905.0,
+                "exitoso": true
+            },
+            {
+                "destino": 6,
+                "duracion_ms": 896,
+                "duracion_control_ms": 875.13,
+                "ancho_destino_px": 141.42,
+                "distancia_inicial_px": 968.52,
+                "exitoso": true
+            },
+            {
+                "destino": 7,
+                "duracion_ms": 816,
+                "duracion_control_ms": 909.65,
+                "ancho_destino_px": 50,
+                "distancia_inicial_px": 382.0,
+                "exitoso": true
+            },
+            {
+                "destino": 8,
+                "duracion_ms": 688,
+                "duracion_control_ms": 715.06,
+                "ancho_destino_px": 233.35,
+                "distancia_inicial_px": 939.6,
+                "exitoso": true
+            }
+        ]
+    }
+}

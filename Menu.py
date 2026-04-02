@@ -10,9 +10,9 @@ class MenuEvaluacion:
         self.root.title("Interfaz de Evaluación Motriz - G3")
         self.root.geometry("450x400")
         self.root.resizable(True, True)
-        
+
         self.id_paciente = ""
-        
+
         self.frame_principal = tk.Frame(root, padx=20, pady=20)
         self.frame_principal.pack(expand=True, fill="both")
 
@@ -28,6 +28,12 @@ class MenuEvaluacion:
 
         self.root.after(100, self.solicitar_nombre)
 
+        # Vincular la tecla Escape para cerrar la ventana
+        self.root.bind('<Escape>', self.cerrar_ventana)
+
+    def cerrar_ventana(self, event=None):
+        self.root.destroy()
+
     def crear_boton(self, texto, comando):
         btn = tk.Button(self.frame_principal, text=texto, font=("Helvetica", 11), width=30, height=2, command=comando)
         btn.pack(pady=10)
@@ -36,7 +42,7 @@ class MenuEvaluacion:
         nombre = simpledialog.askstring("Identificación", "Ingrese el nombre del paciente:", parent=self.root)
         if nombre and nombre.strip():
             self.id_paciente = nombre.strip()
-            self.lbl_paciente.config(text=f"Paciente actual: {self.id_paciente}", fg="darkgreen")
+            self.lbl_paciente.config(text=f"Paciente actual: {self.id_paciente} | Presione ESC para salir", fg="darkgreen")
         else:
             messagebox.showwarning("Atención", "El nombre del paciente es obligatorio.")
             self.solicitar_nombre()
@@ -56,7 +62,7 @@ class MenuEvaluacion:
         if self.confirmar_usuario():
             self.root.withdraw()
             try:
-                AS.ejecutar_prueba_arrastre(self.id_paciente)
+                AS.ejecutar_prueba_arrastre(self.id_paciente, self.root)
             except Exception as e:
                 messagebox.showerror("Error", f"Error en Arrastre Sostenido: {e}")
             self.root.deiconify()
@@ -65,7 +71,7 @@ class MenuEvaluacion:
         if self.confirmar_usuario():
             self.root.withdraw()
             try:
-                BR.ejecutar_prueba_barrido(self.id_paciente)
+                BR.ejecutar_prueba_barrido(self.id_paciente, self.root)
             except Exception as e:
                 messagebox.showerror("Error", f"Error en Barrido Rítmico: {e}")
             self.root.deiconify()

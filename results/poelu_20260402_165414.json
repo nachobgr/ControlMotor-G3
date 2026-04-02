@@ -1,0 +1,37 @@
+{
+    "paciente_id": "poelu",
+    "fecha_registro": "2026-04-02 16:54:14",
+    "datos_sesion": {
+        "velocidad_optima_ms": 504,
+        "tiempos_reaccion_ms": [
+            373,
+            353,
+            366,
+            352,
+            253,
+            242,
+            328,
+            431,
+            365,
+            355,
+            235,
+            296,
+            242,
+            223,
+            274,
+            203,
+            322,
+            329,
+            303,
+            266
+        ],
+        "tr_promedio_ms": 305.55,
+        "errores_impulsividad": 4,
+        "errores_omision": 16,
+        "fallos_fase_validacion": 2,
+        "modo_libre_texto_final": "JAW",
+        "modo_libre_tiempo_s": 13.11,
+        "modo_libre_cps": 0.229,
+        "modo_libre_wpm": 2.75
+    }
+}
