@@ -6,6 +6,7 @@ from datetime import datetime
 from PyQt6.QtWidgets import QApplication, QWidget
 from PyQt6.QtCore import Qt, QRect, QPoint
 from PyQt6.QtGui import QPainter, QColor, QFont, QPen
+import ExportJson as export
 
 class ArrastreSostenido(QWidget):
 
@@ -327,6 +328,18 @@ class ArrastreSostenido(QWidget):
         super().keyPressEvent(event)
 
     def _save_results(self):
+        resultados_finales = {
+            "fecha": datetime.now().isoformat(),
+            "prueba": "ArrastreSostenido",
+            "total_intentos": len(self.results) + self.failed_attempts,
+            "intentos_fallidos": self.failed_attempts,
+            "resultados": self.results,
+        }
+
+        # Llamar a la clase para exportar json
+        logger = export.ClinicalDataLogger("ID_PACIENTE")
+        logger.exportar_datos(resultados_finales)
+        """
         import os
         data = {
             "fecha": datetime.now().isoformat(),
@@ -338,7 +351,7 @@ class ArrastreSostenido(QWidget):
         os.makedirs("results", exist_ok=True)
         filename = f"results/arrastre_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(filename, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+            json.dump(data, f, indent=2, ensure_ascii=False)"""
 
 
 if __name__ == "__main__":

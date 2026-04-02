@@ -38,7 +38,8 @@ class ClinicalDataLogger:
         Recibe un diccionario con las variables que el usuario elija 
         y las guarda en un archivo JSON con marca de tiempo.
         """
-        nombre_archivo = f"{self.patient_id}_evaluacion_{int(time.time())}.json"
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        nombre_archivo = f"{self.patient_id}_{timestamp}.json"
         ruta_completa = os.path.join(self.results_dir, nombre_archivo)
         
         # Estructura final del documento
