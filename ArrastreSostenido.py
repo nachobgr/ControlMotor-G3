@@ -24,8 +24,9 @@ class ArrastreSostenido(QWidget):
     CORNER_MARGIN = 20
     CORNER_SQUARES = {1, 3, 6, 8}
 
-    def __init__(self):
+    def __init__(self, ID_PACIENTE):
         super().__init__()
+        self.ID_PACIENTE = ID_PACIENTE
         self.setWindowTitle("Prueba de Arrastre Sostenido")
         screen = QApplication.primaryScreen().availableGeometry()
         self.WINDOW_W = screen.width()
@@ -337,25 +338,12 @@ class ArrastreSostenido(QWidget):
         }
 
         # Llamar a la clase para exportar json
-        logger = export.ClinicalDataLogger("ID_PACIENTE")
+        logger = export.ClinicalDataLogger(self.ID_PACIENTE)
         logger.exportar_datos(resultados_finales)
-        """
-        import os
-        data = {
-            "fecha": datetime.now().isoformat(),
-            "prueba": "ArrastreSostenido",
-            "total_intentos": len(self.results) + self.failed_attempts,
-            "intentos_fallidos": self.failed_attempts,
-            "resultados": self.results,
-        }
-        os.makedirs("results", exist_ok=True)
-        filename = f"results/arrastre_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)"""
 
 
 def ejecutar_prueba_arrastre(ID_PACIENTE):
     app = QApplication(sys.argv)
-    window = ArrastreSostenido()
+    window = ArrastreSostenido(ID_PACIENTE)
     window.showMaximized()
     sys.exit(app.exec())
