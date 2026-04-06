@@ -11,9 +11,8 @@
  
 - [Descripción general](#descripción-general)
 - [Módulos incluidos](#módulos-incluidos)
-- [Estructura del proyecto](#estructura-del-proyecto)
 - [Requisitos del sistema](#requisitos-del-sistema)
-- [Ejecución rápida (archivo .exe)](#️-ejecución-rápida-archivo-exe)
+- [Ejecución rápida (archivo .exe)](#Ejecución-rápida-(archivo-.exe))
 - [Modo desarrollador (desde el código fuente)](#️-modo-desarrollador-desde-el-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
 - [Prompts utilizados](#prompts-utilizados)
