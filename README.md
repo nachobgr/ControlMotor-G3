@@ -115,7 +115,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ### Pasos:
  
-1. Ejecutar como administrador el archivo `Menu.exe` del repositorio.
+1. Descargar el archivo `Menu.exe` desde `ControlMotor-G3/releases/tag/release`.
 2. Hacer **doble clic** en el ejecutable.
 3. Si Windows muestra una advertencia de seguridad, hacer clic en **"Más información" → "Ejecutar de todas formas"**.
 4. Se abrirá el menú principal. Ingresar el nombre del paciente cuando se solicite.
