@@ -31,7 +31,7 @@ El sistema cuenta con una **interfaz de menú principal** desde la cual se acced
  
 ## Módulos incluidos
  
-### 1. 🖱️ Arrastre Sostenido (`ArrastreSostenido.py`)
+### 1. Arrastre Sostenido (`ArrastreSostenido.py`)
  
 Evalúa el **control motor fino** y la **fatiga muscular** mediante una tarea de arrastrar y soltar (drag & drop).
  
@@ -52,7 +52,7 @@ Evalúa el **control motor fino** y la **fatiga muscular** mediante una tarea de
  
 ---
  
-### 2. ⌨️ Barrido Rítmico (`BarridoRitmico.py`)
+### 2. Barrido Rítmico (`BarridoRitmico.py`)
  
 Sistema de **selección por pulsador único** para pacientes con movilidad mínima (scanning fila-columna).
  
@@ -78,7 +78,7 @@ El módulo consta de tres fases progresivas:
  
 ---
  
-### 3. 🖱️ Ganancia Adaptativa (`GananciaAdaptativa.py`)
+### 3. Ganancia Adaptativa (`GananciaAdaptativa.py`)
  
 Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema operativo para pacientes con rango de movimiento (ROM) limitado.
  
@@ -109,23 +109,23 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## ▶️ Ejecución rápida (archivo .exe)
+## Ejecución rápida (archivo .exe)
  
 > Para usuarios sin entorno de desarrollo. No requiere instalación de Python ni dependencias.
  
 ### Pasos:
  
-1. Descargar el archivo `OpenRehab_G3.exe` desde la sección [**Releases**](https://github.com/tu-org/openrehab-g3/releases/latest) del repositorio.
+1. Ejecutar como administrador el archivo `Menu.exe` desde la ruta `ControlMotor-G3\dist\Menu.exe` del repositorio.
 2. Hacer **doble clic** en el ejecutable.
 3. Si Windows muestra una advertencia de seguridad, hacer clic en **"Más información" → "Ejecutar de todas formas"**.
 4. Se abrirá el menú principal. Ingresar el nombre del paciente cuando se solicite.
 5. Seleccionar la prueba a realizar desde el menú.
  
-> 📁 Los resultados se guardarán automáticamente en la carpeta `results/` ubicada en el mismo directorio que el `.exe`.
+> Los resultados se guardarán automáticamente en la carpeta `results/`.
  
 ---
  
-## 🛠️ Modo desarrollador (desde el código fuente)
+## Modo desarrollador (desde el código fuente)
  
 ### 1. Clonar el repositorio
  
