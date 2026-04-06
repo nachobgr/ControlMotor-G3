@@ -13,7 +13,7 @@
 - [Módulos incluidos](#módulos-incluidos)
 - [Requisitos del sistema](#requisitos-del-sistema)
 - [Ejecución rápida](#Ejecución-rápida)
-- [Ejecución desde código fuente](#️Ejecución-desde-código-fuente)
+- [Ejecución código fuente](#️Ejecución-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
 - [Prompts utilizados](#prompts-utilizados)
 - [Créditos](#créditos)
@@ -124,7 +124,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Ejecución desde código fuente
+## Ejecución código fuente
  
 ### 1. Clonar el repositorio
  
