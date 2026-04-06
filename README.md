@@ -1,5 +1,5 @@
 
-# 🧠 OpenRehab ACV — Área 2: Control Motor y Acceso (Hemiparesia)
+# Área 2: Control Motor y Acceso (Hemiparesia)
 ### Ingeniería en Rehabilitación · Ciclo 2026 · Grupo 3
 ## Ignacio Bergara, Lautaro Aguzin y Leonel Pastor 
  
@@ -7,14 +7,14 @@
  
 ---
  
-## 📋 Índice
+## Índice
  
 - [Descripción general](#descripción-general)
 - [Módulos incluidos](#módulos-incluidos)
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Requisitos del sistema](#requisitos-del-sistema)
-- [▶️ Ejecución rápida (archivo .exe)](#️-ejecución-rápida-archivo-exe)
-- [🛠️ Modo desarrollador (desde el código fuente)](#️-modo-desarrollador-desde-el-código-fuente)
+- [Ejecución rápida (archivo .exe)](#️-ejecución-rápida-archivo-exe)
+- [Modo desarrollador (desde el código fuente)](#️-modo-desarrollador-desde-el-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
 - [Prompts utilizados](#prompts-utilizados)
 - [Créditos](#créditos)
