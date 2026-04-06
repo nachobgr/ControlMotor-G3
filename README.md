@@ -13,7 +13,7 @@
 - [Módulos incluidos](#módulos-incluidos)
 - [Requisitos del sistema](#requisitos-del-sistema)
 - [Ejecución rápida](#Ejecución-rápida)
-- [Modo desarrollador desde el código fuente](#️-modo-desarrollador-desde-el-código-fuente)
+- [Ejecución desde código fuente](#️Ejecución-desde-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
 - [Prompts utilizados](#prompts-utilizados)
 - [Créditos](#créditos)
