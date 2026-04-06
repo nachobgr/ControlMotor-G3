@@ -12,7 +12,7 @@
 - [Descripción general](#descripción-general)
 - [Módulos incluidos](#módulos-incluidos)
 - [Requisitos del sistema](#requisitos-del-sistema)
-- [Ejecución rápida (archivo .exe)](#Ejecución-rápida-(archivo-.exe))
+- [Ejecución rápida (archivo .exe)](#Ejecución-rápida-mediante-archivo-.exe)
 - [Modo desarrollador (desde el código fuente)](#️-modo-desarrollador-desde-el-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
 - [Prompts utilizados](#prompts-utilizados)
@@ -108,7 +108,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Ejecución rápida (archivo .exe)
+## Ejecución rápida mediante archivo .exe
  
 > Para usuarios sin entorno de desarrollo. No requiere instalación de Python ni dependencias.
  
@@ -124,7 +124,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Modo desarrollador (desde el código fuente)
+## Modo desarrollador desde el código fuente
  
 ### 1. Clonar el repositorio
  
