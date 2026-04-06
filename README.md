@@ -1,7 +1,7 @@
 
 # 🧠 OpenRehab ACV — Área 2: Control Motor y Acceso (Hemiparesia)
 ### Ingeniería en Rehabilitación · Ciclo 2026 · Grupo 3
-## Ignacio Bergara, Aguzin Lautaro y Leonel Pastor 
+## Ignacio Bergara, Lautaro Aguzin y Leonel Pastor 
  
 > Plataforma de evaluación motora para pacientes con hemiparesia. Incluye tres módulos funcionales de diagnóstico clínico que registran métricas objetivas y las exportan en formato JSON.
  
