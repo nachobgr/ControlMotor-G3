@@ -124,7 +124,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Modo desarrollador desde el código fuente
+## Ejecución desde código fuente
  
 ### 1. Clonar el repositorio
  
