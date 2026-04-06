@@ -12,7 +12,7 @@
 - [Descripción general](#descripción-general)
 - [Módulos incluidos](#módulos-incluidos)
 - [Requisitos del sistema](#requisitos-del-sistema)
-- [Ejecución rápida mediante archivo .exe](#Ejecución-rápida-mediante-archivo-.exe)
+- [Ejecución rápida](#Ejecución-rápida)
 - [Modo desarrollador desde el código fuente](#️-modo-desarrollador-desde-el-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
 - [Prompts utilizados](#prompts-utilizados)
@@ -108,7 +108,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Ejecución rápida mediante archivo .exe
+## Ejecución rápida
  
 > Para usuarios sin entorno de desarrollo. No requiere instalación de Python ni dependencias.
  
