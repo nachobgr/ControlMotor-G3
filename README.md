@@ -11,12 +11,10 @@
  
 - [Descripción general](#descripción-general)
 - [Módulos incluidos](#módulos-incluidos)
-- [Estructura del proyecto](#estructura-del-proyecto)
 - [Requisitos del sistema](#requisitos-del-sistema)
-- [Ejecución rápida (archivo .exe)](#️-ejecución-rápida-archivo-exe)
-- [Modo desarrollador (desde el código fuente)](#️-modo-desarrollador-desde-el-código-fuente)
+- [Ejecución rápida](#Ejecución-rápida)
+- [Ejecución desde código fuente](#️Ejecución-desde-código-fuente)
 - [Formato de salida JSON](#formato-de-salida-json)
-- [Prompts utilizados](#prompts-utilizados)
 - [Créditos](#créditos)
  
 ---
@@ -109,13 +107,13 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Ejecución rápida (archivo .exe)
+## Ejecución rápida
  
 > Para usuarios sin entorno de desarrollo. No requiere instalación de Python ni dependencias.
  
 ### Pasos:
  
-1. Ejecutar como administrador el archivo `Menu.exe` del repositorio.
+1. Descargar el archivo `Menu.exe` desde `ControlMotor-G3/releases/tag/release`.
 2. Hacer **doble clic** en el ejecutable.
 3. Si Windows muestra una advertencia de seguridad, hacer clic en **"Más información" → "Ejecutar de todas formas"**.
 4. Se abrirá el menú principal. Ingresar el nombre del paciente cuando se solicite.
@@ -125,7 +123,7 @@ Módulo que **ajusta automáticamente la sensibilidad del mouse** del sistema op
  
 ---
  
-## Modo desarrollador (desde el código fuente)
+## Ejecución desde código fuente
  
 ### 1. Clonar el repositorio
  
